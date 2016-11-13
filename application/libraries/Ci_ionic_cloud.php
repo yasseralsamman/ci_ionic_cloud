@@ -43,21 +43,15 @@ class Ci_ionic_cloud {
   *
   * Returns a paginated collection of Users as documented at http://docs.ionic.io/api/endpoints/auth.html#get-users .
   *
-  * @param integer $page_size the number of items to return in paginated endpoints.
-  *
-  *	@param integer $page the page number for paginated endpoints.
+  * @param array $params array containing page_siza and page parameters
 	*
   * @return string JSON Object contating user list.
   */
-	function auth_users_list($page_size = null , $page = null) {
-		$data = array ();
-		if(isset($page_size) && isset($page)) {
-			$data = array (
-				'page_size' => $page_size,
-				'page'			=> $page
-			);
+	function auth_users_list($params) {
+		if(isset($params['page_size']) && isset($params['page'])) {
+			return $this->curlRequest($this->getRequestUrl('auth','users',$params),'GET');
 		}
-		return $this->curlRequest($this->getRequestUrl('auth','users',$data),'GET');
+		return null;
 	}
 
 	/**
@@ -65,41 +59,68 @@ class Ci_ionic_cloud {
   *
   * Creates a single user as documented at http://docs.ionic.io/api/endpoints/auth.html#post-users
   *
-  * @param integer $page_size the number of items to return in paginated endpoints
-  *
-  *	@param integer $page the page number for paginated endpoints
+  * @param array $params contains the request paremeters for the create function
 	*
-  * @return void
+  * @return string JSON Object contating user object.
   */
-	function auth_users_create($email, $password, $username='', $name='', $image='', $custom = array()) {
-		$reflect = new ReflectionClass(__CLASS__);
-		$params = $reflect->getMethod(__FUNCTION__)->getParameters();
-		$data['app_id'] = $this->app_id;
-		foreach($params as $param) {
-			if(isset($param->name) && !$this->isNullOrEmptyString($param->name)) {
-				$data[$param->name] = ${$param->name};
-			}
-			else if(is_array($param->name) && !empty($param->name)){
-				$data[$param->name] = json_encode(${$param->name});
-			}
-		}
-		$data = json_encode($data);
-		return $this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $data);
+	function auth_users_create($params) {
+		$params['app_id'] = $this->app_id;
+		if(isset($params['email']) && isset($params['password'])) {
+			$params = json_encode($params);
+			return $this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $params);
+		}	
+		return null;
 	}
 
 	/**
   * Retrieve A Single User.
   *
-  * Returns the retrieved user object as documented at http://docs.ionic.io/api/endpoints/auth.html#get-users .
+  * Returns the retrieved user object as documented at http://docs.ionic.io/api/endpoints/auth.html#get-users-user_uuid .
   *
-  * @param string $uuid the cloud id of the user.
+  * @param array $params contains the cloud id of the user uuid.
 	*
   * @return string JSON Object with the user info.
   */
-	function auth_users_retrieve($uuid) {
-		if(isset($uuid)) {
-			return $this->curlRequest($this->getRequestUrl('auth','users',$uuid),'GET');
+	function auth_users_retrieve($params) {
+		if(isset($params['uuid'])) {
+			return $this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'GET');
 		}
+		return null;
+	}
+
+	/**
+  * Update User.
+  *
+  * Update a single user as documented at http://docs.ionic.io/api/endpoints/auth.html#patch-users-user_uuid
+  *
+	* @param string $params contains the request paremeters for the update function
+	*
+  * @return void
+  */
+	function auth_users_update($params) {
+		if(isset($params['uuid'])) {
+			$uuid = $params['uuid'];
+			unset($params['uuid']);
+			$params = json_encode($params);
+			return $this->curlRequest($this->getRequestUrl('auth','users',$uuid) , 'PATCH' , $params);
+		}
+		return null;
+	}
+
+	/**
+  * Delete A Single User.
+  *
+  * Returns 204 response as documented at http://docs.ionic.io/api/endpoints/auth.html#delete-users-user_uuid
+  *
+  * @param array $params contains the cloud id of the user uuid.
+	*
+  * @return No Content 204 response
+  */
+	function auth_users_delete($params) {
+		if(isset($params['uuid'])) {
+			return $this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'DELETE');
+		}
+		return null;
 	}
 
 	/**
@@ -120,7 +141,6 @@ class Ci_ionic_cloud {
 			if(is_array($data)) {
 				$data = "?".http_build_query($data);
 			}
-			print_r("https://api.ionic.io/$endpoint/$method/$data");
 			return "https://api.ionic.io/$endpoint/$method/$data";
 		}
 		return "https://api.ionic.io/$endpoint/$method";
