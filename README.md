@@ -94,6 +94,26 @@ First of all you need to load the library in you controller
 
   `));`
 
+* [Retrieve Custom Data](http://docs.ionic.io/api/endpoints/auth.html#get-users-user_uuid-custom)
+
+  `$this->ci_ionic_cloud->auth_users_retrieve_custom_data(array(`
+
+  `  'uuid'=> 'user_id_from_cloud' //Required` 
+
+  `));`
+
+* [Replace Custom Data](http://docs.ionic.io/api/endpoints/auth.html#put-users-user_uuid-custom)
+
+  `$this->ci_ionic_cloud->auth_users_replace_custom_data(array(`
+
+  `   'uuid' => 'user_id_from_cloud', //Required`
+	
+  `   'new custom key' => 'new custom value',`
+
+  `   'new something' => 'new something value',` 
+
+  `));`
+
   ### License
   GNU General Public License v 3.0
 

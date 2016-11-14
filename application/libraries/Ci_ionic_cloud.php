@@ -45,11 +45,14 @@ class Ci_ionic_cloud {
   *
   * @param array $params array containing page_siza and page parameters
 	*
-  * @return string JSON Object contating user list.
+  * @return array list of user objects.
   */
 	function auth_users_list($params) {
 		if(isset($params['page_size']) && isset($params['page'])) {
-			return $this->curlRequest($this->getRequestUrl('auth','users',$params),'GET');
+			$reponse = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$params),'GET'));
+			if($reponse->meta->status == 200) {
+				return $reponse->data;
+			}
 		}
 		return null;
 	}
@@ -61,13 +64,16 @@ class Ci_ionic_cloud {
   *
   * @param array $params contains the request paremeters for the create function
 	*
-  * @return string JSON Object contating user object.
+  * @return object Object contating user info.
   */
 	function auth_users_create($params) {
 		$params['app_id'] = $this->app_id;
 		if(isset($params['email']) && isset($params['password'])) {
 			$params = json_encode($params);
-			return $this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $params);
+			$reponse = json_decode($this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $params));
+			if($response->meta->status == 201) {
+				return $response->data;
+			}
 		}	
 		return null;
 	}
@@ -79,11 +85,14 @@ class Ci_ionic_cloud {
   *
   * @param array $params contains the cloud id of the user uuid.
 	*
-  * @return string JSON Object with the user info.
+  * @return object Object contating user info.
   */
 	function auth_users_retrieve($params) {
 		if(isset($params['uuid'])) {
-			return $this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'GET');
+			$reponse = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'GET'));
+			if($reponse->meta->status == 200) {
+				return $reponse->data;
+			}
 		}
 		return null;
 	}
@@ -95,14 +104,17 @@ class Ci_ionic_cloud {
   *
 	* @param string $params contains the request paremeters for the update function
 	*
-  * @return void
+  * @return object Object contating user info after update.
   */
 	function auth_users_update($params) {
 		if(isset($params['uuid'])) {
 			$uuid = $params['uuid'];
 			unset($params['uuid']);
 			$params = json_encode($params);
-			return $this->curlRequest($this->getRequestUrl('auth','users',$uuid) , 'PATCH' , $params);
+			$response = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$uuid) , 'PATCH' , $params));
+			if($response->meta->status == 200) {
+				return $response->data;
+			}
 		}
 		return null;
 	}
@@ -114,14 +126,60 @@ class Ci_ionic_cloud {
   *
   * @param array $params contains the cloud id of the user uuid.
 	*
-  * @return No Content 204 response
+  * @return boolean True if the user deleted successfully 
   */
 	function auth_users_delete($params) {
 		if(isset($params['uuid'])) {
-			return $this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'DELETE');
+			$response = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']),'DELETE'));
+			if(isset($response) && $response->meta->status == 404) {
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+
+	/**
+  * Retrieve A Single Users Custom Data.
+  *
+  * Returns the retrieved user custom data object as documented at http://docs.ionic.io/api/endpoints/auth.html#get-users-user_uuid-custom .
+  *
+  * @param array $params contains the cloud id of the user uuid.
+	*
+  * @return object Object contating user custom data.
+  */
+	function auth_users_retrieve_custom_data($params) {
+		if(isset($params['uuid'])) {
+			$reponse = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$params['uuid']."/custom"),'GET'));
+			if($reponse->meta->status == 200) {
+				return $reponse->data;
+			}
 		}
 		return null;
 	}
+
+	/**
+  * Replace User Custom Data.
+  *
+  * Replace a single user's custom data as documented at http://docs.ionic.io/api/endpoints/auth.html#put-users-user_uuid-custom
+  *
+	* @param string $params contains the request paremeters for the update function
+	*
+  * @return object Object contating custom user data after Replace.
+  */
+	function auth_users_replace_custom_data($params) {
+		if(isset($params['uuid'])) {
+			$uuid = $params['uuid'];
+			unset($params['uuid']);
+			$params = json_encode($params);
+			$response = json_decode($this->curlRequest($this->getRequestUrl('auth','users',$uuid.'/custom') , 'PUT' , $params));
+			if($response->meta->status == 200) {
+				return $response->data;
+			}
+		}
+		return null;
+	}
+
+
 
 	/**
   * Generate Proper Request to Ionic Cloud.
@@ -137,13 +195,14 @@ class Ci_ionic_cloud {
   * @return void
   */
 	private function getRequestUrl($endpoint,$method,$data = null) {
+		$baseUrl = 'https://api.ionic.io';
 		if(isset($data) && !empty($data)) {
 			if(is_array($data)) {
 				$data = "?".http_build_query($data);
 			}
-			return "https://api.ionic.io/$endpoint/$method/$data";
+			return "$baseUrl/$endpoint/$method/$data";
 		}
-		return "https://api.ionic.io/$endpoint/$method";
+		return "$baseUrl/$endpoint/$method";
 	}
 
 	/**
