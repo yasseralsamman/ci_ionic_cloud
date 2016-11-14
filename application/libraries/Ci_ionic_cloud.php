@@ -53,8 +53,9 @@ class Ci_ionic_cloud {
 			if($reponse->meta->status == 200) {
 				return $reponse->data;
 			}
+			return $response->error->message;
 		}
-		return null;
+		return "One or more parameters are not set";
 	}
 
 	/**
@@ -70,12 +71,13 @@ class Ci_ionic_cloud {
 		$params['app_id'] = $this->app_id;
 		if(isset($params['email']) && isset($params['password'])) {
 			$params = json_encode($params);
-			$reponse = json_decode($this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $params));
+			$response = json_decode($this->curlRequest($this->getRequestUrl('auth','users') , 'POST' , $params));
 			if($response->meta->status == 201) {
 				return $response->data;
 			}
+			return $response->error->message;
 		}	
-		return null;
+		return "One or more parameters are not set";
 	}
 
 	/**
@@ -93,8 +95,9 @@ class Ci_ionic_cloud {
 			if($reponse->meta->status == 200) {
 				return $reponse->data;
 			}
-		}
-		return null;
+			return $response->error->message;
+		}	
+		return "One or more parameters are not set";
 	}
 
 	/**
@@ -115,8 +118,9 @@ class Ci_ionic_cloud {
 			if($response->meta->status == 200) {
 				return $response->data;
 			}
-		}
-		return null;
+			return $response->error->message;
+		}	
+		return "One or more parameters are not set";
 	}
 
 	/**
@@ -153,8 +157,9 @@ class Ci_ionic_cloud {
 			if($reponse->meta->status == 200) {
 				return $reponse->data;
 			}
-		}
-		return null;
+			return $response->error->message;
+		}	
+		return "One or more parameters are not set";
 	}
 
 	/**
@@ -162,7 +167,7 @@ class Ci_ionic_cloud {
   *
   * Replace a single user's custom data as documented at http://docs.ionic.io/api/endpoints/auth.html#put-users-user_uuid-custom
   *
-	* @param string $params contains the request paremeters for the update function
+	* @param string $params contains the request paremeters for the replace function
 	*
   * @return object Object contating custom user data after Replace.
   */
@@ -175,8 +180,9 @@ class Ci_ionic_cloud {
 			if($response->meta->status == 200) {
 				return $response->data;
 			}
-		}
-		return null;
+			return $response->error->message;
+		}	
+		return "One or more parameters are not set";
 	}
 
 
