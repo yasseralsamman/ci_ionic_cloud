@@ -197,16 +197,54 @@ class Ci_ionic_cloud {
   }
 
   /**
+   * List Device Tokens
+   *
+   * Returns Tokens associated with devices as documented at http://docs.ionic.io/api/endpoints/push.html#get-tokens
+   *
+   * @param array $params contains the request paremeters for the list function
+   * @example docs/usage.php 51 6 Example Usage:
+   * @return array list contating tokens data.
+   */
+  public function push_tokens_list($params) {
+    if (isset($params['page_size']) && isset($params['page'])) {
+      $reponse = json_decode($this->curlRequest($this->getRequestUrl('push', 'tokens', $params), 'GET'));
+      if ($reponse->meta->status == 200) {
+        return $reponse->data;
+      }
+      return $response->error->message;
+    }
+    return "One or more parameters are not set";
+  }
+
+  /**
+   * Create Device Tokens
+   *
+   * Creates a Token to a specified user as documented at http://docs.ionic.io/api/endpoints/push.html#post-tokens
+   *
+   * @param array $params contains the request paremeters for the create function
+   * @example docs/usage.php 58 4 Example Usage:
+   * @return array list contating tokens data.
+   */
+  public function push_tokens_create($params) {
+    if (isset($params['token']) && isset($params['user_id'])) {
+      $params   = json_encode($params);
+      $response = json_decode($this->curlRequest($this->getRequestUrl('push', 'tokens'), 'POST', $params));
+      if ($response->meta->status == 201) {
+        return $response->data;
+      }
+      return $response->error->message;
+    }
+    return "One or more parameters are not set";
+  }
+
+  /**
    * Generate Proper Request to Ionic Cloud.
    *
    * Returns a concatinated string for the requested endpoint and method for ionic cloud.
    *
    * @param string $endpoint the name of the service endpoint
-   *
    * @param string $method the requested method name
-   *
    * @param string $data the params for GET requests
-   *
    * @return void
    */
   private function getRequestUrl($endpoint, $method, $data = null) {
@@ -226,11 +264,8 @@ class Ci_ionic_cloud {
    * Returns the exact response from the ionic cloud.
    *
    * @param string $url the endpoint URL.
-   *
    * @param string $method the requested method type (GET , POST)
-   *
    * @param string $data the params for POST requests
-   *
    * @return string the response from curl request
    */
   private function curlRequest($url, $method, $data = null) {
@@ -267,7 +302,6 @@ class Ci_ionic_cloud {
    * Returns the exact response from the ionic cloud.
    *
    * @param string $str the string to check
-   *
    * @return boolean
    */
   private function isNullOrEmptyString($str) {
