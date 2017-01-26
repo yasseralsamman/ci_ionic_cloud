@@ -1,4 +1,7 @@
 # Ionic Cloud Client Library for CodeIgniter
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bab090604b88417b818da9a0b4f323d9)](https://www.codacy.com/app/yasseralsamman/ci_ionic_cloud?utm_source=github.com&utm_medium=referral&utm_content=yasseralsamman/ci_ionic_cloud&utm_campaign=badger)
+
 ###### (Under Development)
 
 This library is supposed to provide an easy code to use the ionic cloud HTTP API.
